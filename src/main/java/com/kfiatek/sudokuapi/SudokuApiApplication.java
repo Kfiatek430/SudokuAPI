@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class SudokuApiApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(SudokuApiApplication.class, args);
-	}
+  public static void main(String[] args) {
+    SpringApplication.run(SudokuApiApplication.class, args);
+  }
 
 }
