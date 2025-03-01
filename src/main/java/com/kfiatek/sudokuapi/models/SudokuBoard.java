@@ -14,4 +14,12 @@ public class SudokuBoard {
   public void setBoard(int[][] board) {
     this.board = board;
   }
+
+  public int getValue(int row, int col) {
+    return board[row][col];
+  }
+
+  public void setValue(int row, int col, int value) {
+    board[row][col] = value;
+  }
 }
