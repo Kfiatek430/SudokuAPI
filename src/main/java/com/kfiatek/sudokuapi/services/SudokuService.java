@@ -1,19 +1,22 @@
 package com.kfiatek.sudokuapi.services;
 
+import com.kfiatek.sudokuapi.enums.Difficulty;
 import com.kfiatek.sudokuapi.models.SudokuBoard;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.IntStream;
 
 @Service
 public class SudokuService {
-  public SudokuBoard generateSudoku() {
+  public SudokuBoard generateSudoku(String difficulty) {
+    Difficulty level = Difficulty.fromString(difficulty);
     SudokuBoard board = new SudokuBoard();
     solveSudoku(board);
-
+    removeNumbers(board, level);
     return board;
   }
 
@@ -74,5 +77,24 @@ public class SudokuService {
     }
 
     return true;
+  }
+
+  public void removeNumbers(SudokuBoard board, Difficulty level) {
+    int toRemove = switch (level) {
+      case EASY -> 30;
+      case MEDIUM -> 40;
+      case HARD -> 50;
+    };
+
+    Random random = new Random();
+    while (toRemove > 0) {
+      int row = random.nextInt(9);
+      int col = random.nextInt(9);
+
+      if(board.getValue(row, col) != 0) {
+        board.setValue(row, col, 0);
+        toRemove--;
+      }
+    }
   }
 }

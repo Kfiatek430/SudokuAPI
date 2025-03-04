@@ -5,6 +5,7 @@ import com.kfiatek.sudokuapi.services.SudokuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -18,7 +19,7 @@ public class SudokuController {
   }
 
   @GetMapping("/generate")
-  public SudokuBoard generateSudoku() {
-    return sudokuService.generateSudoku();
+  public SudokuBoard generateSudoku(@RequestParam(defaultValue = "medium") String difficulty) {
+    return sudokuService.generateSudoku(difficulty);
   }
 }
