@@ -12,11 +12,10 @@ import java.util.stream.IntStream;
 
 @Service
 public class SudokuService {
-  public SudokuBoard generateSudoku(String difficulty) {
-    Difficulty level = Difficulty.fromString(difficulty);
+  public SudokuBoard generateSudoku(Difficulty difficulty) {
     SudokuBoard board = new SudokuBoard();
-    solveSudoku(board);
-    removeNumbers(board, level);
+    solveSudokuRecursive(board);
+    removeNumbers(board, difficulty);
     return board;
   }
 
@@ -44,32 +43,76 @@ public class SudokuService {
     return true;
   }
 
-  private List<Integer> generateShuffledNumbers() {
-    List<Integer> numbers = new ArrayList<>(IntStream.rangeClosed(1, 9).boxed().toList());
-    Collections.shuffle(numbers);
-    return numbers;
+  public boolean isValidBoard(SudokuBoard board) {
+    return hasValidStructure(board) && getInvalidCells(board).isEmpty();
+  }
+
+  public boolean hasValidStructure(SudokuBoard board) {
+    int[][] grid = board.getBoard();
+    if (grid.length != 9) return false;
+    for (int[] row : grid) {
+      if(row.length != 9) return false;
+      for (int num : row) {
+        if (num < 0 || num > 9) return false;
+      }
+    }
+    return true;
+  }
+
+  public List<int[]> getInvalidCells(SudokuBoard board) {
+    List<int[]> invalidCells = new ArrayList<>();
+    for (int i = 0; i < 9; i++) {
+      for (int j = 0; j < 9; j++) {
+        int num = board.getValue(i, j);
+        if (num < 0 || num > 9) {
+          invalidCells.add(new int[]{i, j});
+          continue;
+        }
+        if (num != 0 && hasConflict(board, i, j, num)) {
+          invalidCells.add(new int[]{i, j});
+        }
+      }
+    }
+    return invalidCells;
+  }
+
+  private boolean hasConflict(SudokuBoard board,  int row, int col, int num) {
+    board.setValue(row, col, 0);
+    boolean conflict = !isValidMove(board, row, col, num);
+    board.setValue(row, col, num);
+    return conflict;
   }
 
   public boolean isValidMove(SudokuBoard board, int row, int col, int num) {
-    for (int i = 0; i < 9; i++) {
-      if(board.getValue(row, i) == num) {
-        return false;
+    return !existsInRow(board, row, num) && !existsInColumn(board, col, num) && !existsInBox(board, row, col, num);
+  }
+
+  private boolean existsInRow(SudokuBoard board, int row, int num) {
+    for (int c = 0; c < 9; c++) {
+      if (board.getValue(row, c) == num) {
+        return true;
       }
     }
+    return false;
+  }
 
-    for (int i = 0; i < 9; i++) {
-      if(board.getValue(i, col) == num) {
-        return false;
+  private boolean existsInColumn(SudokuBoard board, int col, int num) {
+    for (int r = 0; r < 9; r++) {
+      if (board.getValue(r, col) == num) {
+        return true;
       }
     }
+    return false;
+  }
 
-    int boxRowStart = (row / 3) * 3;
-    int boxColStart = (col / 3) * 3;
+  private boolean existsInBox(SudokuBoard board, int row, int col, int num) {
+    int boxRow = row - row % 3;
+    int boxCol = col - col % 3;
 
-    for(int i = boxRowStart; i < boxRowStart + 3; i++) {
-      for(int j = boxColStart; j < boxColStart + 3; j++) {
-        if(board.getValue(i, j) == num) {
-          return false;
+    for (int r = boxRow; r < boxRow + 3; r++) {
+      for (int c = boxCol; c < boxCol + 3; c++) {
+        if (board.getValue(r, c) == num) {
+          return true;
         }
       }
     }
