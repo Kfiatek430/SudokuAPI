@@ -20,29 +20,27 @@ public class SudokuService {
     return board;
   }
 
-  public boolean solveSudoku(SudokuBoard board) {
+  public SudokuBoard solveSudoku(SudokuBoard board) {
+    return isValidBoard(board) && solveSudokuRecursive(board) ? board : null;
+  }
+
+  public boolean solveSudokuRecursive(SudokuBoard board) {
     for(int i = 0; i < 9; i++) {
       for(int j = 0; j < 9; j++) {
         if(board.getValue(i, j) == 0) {
-          List<Integer> numbers = generateShuffledNumbers();
-
-          for(int num : numbers) {
+          for(int num : generateShuffledNumbers()) {
             if(isValidMove(board, i, j, num)) {
               board.setValue(i, j, num);
-
-              if(solveSudoku(board)) {
+              if(solveSudokuRecursive(board)) {
                 return true;
               }
-
               board.setValue(i, j, 0);
             }
           }
-
           return false;
         }
       }
     }
-
     return true;
   }
 
