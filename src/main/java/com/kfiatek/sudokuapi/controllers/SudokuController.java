@@ -23,9 +23,14 @@ public class SudokuController {
     this.sudokuService = sudokuService;
   }
 
-  @GetMapping("/generate")
-  public SudokuBoard generateSudoku(@RequestParam(defaultValue = "medium") String difficulty) {
-    return sudokuService.generateSudoku(difficulty);
+  @PostMapping("/generate")
+  public ResponseEntity<SudokuGenerateResponse> generateSudoku(@RequestBody(required = false) Map<String, String> request) {
+    String inputDifficulty = (request != null) ? request.getOrDefault("difficulty", "medium") : "medium";
+    Difficulty difficulty = Difficulty.fromString(inputDifficulty);
+    SudokuBoard board = sudokuService.generateSudoku(difficulty);
+    return ResponseEntity.ok(new SudokuGenerateResponse(board.getBoard(), difficulty.name().toLowerCase()));
+  }
+
   @PostMapping("/solve")
   public ResponseEntity<SudokuSolveResponse> solveSudoku(@RequestBody SudokuBoard board) {
     SudokuBoard solvedBoard = sudokuService.solveSudoku(board);
