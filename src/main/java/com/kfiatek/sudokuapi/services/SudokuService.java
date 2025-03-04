@@ -116,8 +116,13 @@ public class SudokuService {
         }
       }
     }
+    return false;
+  }
 
-    return true;
+  private List<Integer> generateShuffledNumbers() {
+    List<Integer> numbers = new ArrayList<>(IntStream.rangeClosed(1, 9).boxed().toList());
+    Collections.shuffle(numbers);
+    return numbers;
   }
 
   public void removeNumbers(SudokuBoard board, Difficulty level) {
